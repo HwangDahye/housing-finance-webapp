@@ -11,9 +11,11 @@ import com.hdh.housingfinancewebapp.exception.auth.UserNotFoundException;
 import com.hdh.housingfinancewebapp.security.JwtTokenProvider;
 import com.hdh.housingfinancewebapp.service.LoginService;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,8 +32,10 @@ public class LoginRestController {
   @Autowired private LoginService loginService;
 
   @PostMapping(path={"/signup"})
-  public CommonResult signup(@RequestBody @Valid SignUpReq signUpReq) throws DuplicatedUserException {
-    return loginService.doSignUp(signUpReq);
+  public CommonResult signup(@RequestBody @Valid SignUpReq signUpReq, HttpServletResponse res) throws DuplicatedUserException {
+    CommonResult result = loginService.doSignUp(signUpReq);
+    res.setStatus(HttpStatus.CREATED.value());
+    return result;
   }
 
   @GetMapping(path={"/signin"})

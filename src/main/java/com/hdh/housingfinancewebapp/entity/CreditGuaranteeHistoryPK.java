@@ -3,6 +3,8 @@ package com.hdh.housingfinancewebapp.entity;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,5 +25,7 @@ public class CreditGuaranteeHistoryPK implements Serializable {
   private int month;
 
 //  @Column(name = "bank", nullable = false)
-  private String bank;
+  @ManyToOne
+  @JoinColumn(name ="institute_code")
+  private Bank bank;
 }

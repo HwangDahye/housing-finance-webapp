@@ -1,6 +1,6 @@
 package com.hdh.housingfinancewebapp.dto.response.finance;
 
-import com.hdh.housingfinancewebapp.dto.AmountOfYear;
+import com.hdh.housingfinancewebapp.dto.TotalAmountGroupbyYearBankDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,12 +10,12 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AvgAmountResultItem {
+public class MinMaxAvgAmountResultItem {
   private int year;
   private int amount;
 
-  public AvgAmountResultItem(AmountOfYear obj){
+  public MinMaxAvgAmountResultItem(TotalAmountGroupbyYearBankDto obj){
     this.year = obj.getYear();
-    this.amount = obj.getTotalAmountOfBank();
+    this.amount = obj.getTotalAmount();
   }
 }

@@ -8,8 +8,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class TotalAmountResult {
+public class TotalEachYearResultContent {
   private int year;
-  private int totalAmount;
-  private Map<String, Integer> detailAmount;
+  private int total_amount;
+  private Map<String, Integer> detail_amount;
 }

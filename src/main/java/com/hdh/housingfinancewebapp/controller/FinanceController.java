@@ -1,12 +1,10 @@
 package com.hdh.housingfinancewebapp.controller;
 
-import com.hdh.housingfinancewebapp.dto.response.CommonResult;
 import com.hdh.housingfinancewebapp.dto.response.ObjectResult;
-import com.hdh.housingfinancewebapp.dto.response.finance.AvgAmountResult;
+import com.hdh.housingfinancewebapp.dto.response.finance.MinMaxAvgAmountResult;
 import com.hdh.housingfinancewebapp.dto.response.finance.PredictResult;
-import com.hdh.housingfinancewebapp.dto.response.finance.TotalAmountResult;
 import com.hdh.housingfinancewebapp.dto.response.finance.TopBankResult;
-import com.hdh.housingfinancewebapp.entity.Bank;
+import com.hdh.housingfinancewebapp.dto.response.finance.TotalEachYearResult;
 import com.hdh.housingfinancewebapp.entity.CreditGuaranteeHistory;
 import com.hdh.housingfinancewebapp.service.FinanceService;
 import java.util.List;
@@ -43,20 +41,20 @@ public class FinanceController {
   }
 
   @GetMapping(path = "/total/amount")
-  public ObjectResult<List<TotalAmountResult>> getTotalAmountOfYear(){
-    return financeService.getTotalAmountOfYear();
+  public ObjectResult<TotalEachYearResult> getTotalEachYear(){
+    return financeService.getTotalEachYear();
   }
 
   @GetMapping(path = "/top")
-  public ObjectResult<TopBankResult> getTopInstitution(){
-    return financeService.getTopInstitution();
+  public ObjectResult<TopBankResult> getTopBank(){
+    return financeService.getTopBank();
   }
 
-  @GetMapping(path = {"/average/amount", "/average/amount/{bank}"})
-  public ObjectResult<AvgAmountResult> getMaxAndMinAvgAmountOfYear(@PathVariable("bank") Optional<String> bank){
+  @GetMapping(path = {"/minmax/avg/amount", "/minmax/avg/amount/{bank}"})
+  public ObjectResult<MinMaxAvgAmountResult> getMinMaxAvgAmount(@PathVariable("bank") Optional<String> bank){
     // TODO : 한글 깨짐
 //    bank.orElse(defaultBank);
-    return financeService.getMaxAndMinAvgAmountOfYear(bank.isPresent() ? bank.get() : "외환은행");
+    return financeService.getMinMaxAvgAmount(bank.isPresent() ? bank.get() : "외환은행");
   }
 
   @GetMapping(path = "/predict")

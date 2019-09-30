@@ -47,11 +47,11 @@ public class SignUpTest {
     MvcResult result = mockMvc.perform(post(SIGN_UP_URI)
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsBytes(signUpReq)))
-        .andExpect(status().isOk())
+        .andExpect(status().isCreated())
         .andDo(print())
         .andReturn();
 
-    assertThat(result.getResponse().getStatus(), is(HttpStatus.OK.value()));
+    assertThat(result.getResponse().getStatus(), is(HttpStatus.CREATED.value()));
   }
 
   @Test

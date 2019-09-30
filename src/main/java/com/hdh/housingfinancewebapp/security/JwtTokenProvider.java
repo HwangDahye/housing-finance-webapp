@@ -76,21 +76,14 @@ public class JwtTokenProvider {   // JWT 토큰 생성 및 검증 모듈
 
   // Jwt 토큰으로 인증 정보를 조회
   public Authentication getAuthentication(String token) {
-    // token값에서 userSeq 꺼내와서, 해당 userSeq로 유저 정보 조회함
     User user = userService.getUser(this.getUserId(token));
-    // 찾은 user정보를, 인증정보에 담아서 반환해줌. 권한은 인증이 완료될때마다, USER로 내려줌
-    return new JwtAuthToken(user.getId(), user.getPassword(), user.getUserSeq(), createAuthorityList("ROLE_USER"));
+    return new JwtAuthToken(user.getId(), user.getPassword(), createAuthorityList("ROLE_USER"));
   }
 
   // Jwt 토큰에서 회원 구별 정보 추출
   public String getUserId(String token) {
     return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
   }
-
-  // Request의 Header에서 token 파싱 : "Authorization: Bearer jwt토큰"
-//  public String resolveToken(HttpServletRequest req) {
-//    return req.getHeader("X-AUTH-TOKEN");
-//  }
 
   // Request의 Header에서 token 파싱 : "Authorization: Bearer jwt토큰"
   public String resolveToken(HttpServletRequest req) throws AuthRequestException{
@@ -119,12 +112,23 @@ public class JwtTokenProvider {   // JWT 토큰 생성 및 검증 모듈
   }
 
   // Jwt Refresh 토큰의 유효성 + 만료일자 확인
-  public boolean validateRefreshToken(String jwtToken) {
+  public boolean validateRefreshToken(String refreshToken) {
     try {
-      Jws<Claims> claims = Jwts.parser().setSigningKey(refreshSecretKey).parseClaimsJws(jwtToken);
+      Jws<Claims> claims = Jwts.parser().setSigningKey(refreshSecretKey).parseClaimsJws(refreshToken);
       return !claims.getBody().getExpiration().before(new Date());
     } catch (Exception e) {
       return false;
+    }
+  }
+
+  // Jwt Refresh 토큰 갱신여부 체크
+  public boolean isReissueRefreshToken(String refreshToken){
+    try {
+      Date now = new Date();
+      Jws<Claims> claims = Jwts.parser().setSigningKey(refreshSecretKey).parseClaimsJws(refreshToken);
+      return claims.getBody().getExpiration().before(new Date(now.getTime() + refreshTokenValidMillisecond/2));
+    } catch (Exception e) {
+      return true;
     }
   }
 }

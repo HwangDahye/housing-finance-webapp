@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.hdh</groupId>
-	<artifactId>housing-creditGuaranteeHistory-webapp</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>housing-creditGuaranteeHistory-webapp</name>
+	<artifactId>housing-finance-webapp</artifactId>
+	<version>0.0.1</version>
+	<name>housing-finance-webapp</name>
 	<description>Kakao Pay 2019 Server Project</description>
 
 	<properties>
@@ -60,19 +60,6 @@
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt</artifactId>
       <version>0.9.1</version>
-    </dependency>
-
-    <!-- Swagger -->
-    <dependency>
-      <groupId>io.springfox</groupId>
-      <artifactId>springfox-swagger2</artifactId>
-      <version>2.6.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>io.springfox</groupId>
-      <artifactId>springfox-swagger-ui</artifactId>
-      <version>2.6.1</version>
     </dependency>
 	</dependencies>
 

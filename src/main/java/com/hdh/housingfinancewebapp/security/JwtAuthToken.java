@@ -10,7 +10,6 @@ import org.springframework.security.core.GrantedAuthority;
 public class JwtAuthToken extends AbstractAuthenticationToken {
   private Object principal;
   private String credentials;
-  private int userSeq;
 
   public JwtAuthToken(String principal, String credentials) {
     super(null);
@@ -21,13 +20,12 @@ public class JwtAuthToken extends AbstractAuthenticationToken {
   }
 
   // 빈 객체로 사용하지 않기 때문에, 딱히 public을 붙이진 않았음. 의도한건 아님
-  public JwtAuthToken(Object principal, String credentials, int userSeq, Collection<? extends GrantedAuthority> authorities) {
+  public JwtAuthToken(Object principal, String credentials, Collection<? extends GrantedAuthority> authorities) {
     super(authorities);
     super.setAuthenticated(true);
 
     this.principal = principal;
     this.credentials = credentials;
-    this.userSeq = userSeq;
   }
 
   @Override
@@ -38,9 +36,5 @@ public class JwtAuthToken extends AbstractAuthenticationToken {
   @Override
   public Object getPrincipal() {
     return this.principal;
-  }
-
-  public int getUserSeq() {
-    return userSeq;
   }
 }

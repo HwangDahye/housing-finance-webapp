@@ -36,7 +36,7 @@ public class ServiceTest {
   private final String GET_BANKS_URI = "/api/finance/banks";
   private final String GET_TOTAL_AMOUNT_URI = "/api/finance/total/amount";
   private final String GET_TOP_BANK_URI = "/api/finance/top";
-  private final String GET_AVG_MIN_MAX_URI = "/api/finance/average/amount";
+  private final String GET_AVG_MIN_MAX_URI = "/api/finance/minmax/avg/amount";
   private final String PREDICT_URI = "/api/finance/predict";
   private final String BEARER_TYPE = "Bearer";
   String id = "user1";

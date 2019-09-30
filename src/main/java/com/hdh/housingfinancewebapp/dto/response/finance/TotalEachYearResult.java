@@ -6,11 +6,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
 @Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AvgAmountResult {
-  private String bank;
-  private List<AvgAmountResultItem> supportAmount;
+public class TotalEachYearResult {
+  private String name;
+  private List<TotalEachYearResultContent> summarys;
 }

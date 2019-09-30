@@ -29,9 +29,9 @@ public class AuthProvider implements AuthenticationProvider {
     if(user != null){
       // user 정보가 모두 유효하면, 토큰을 만든다
       // role 은 USER로 준다
-      JwtAuthToken jwtAuthToken = new JwtAuthToken(user.getId(), user.getPassword(), user.getUserSeq(), createAuthorityList("ROLE_USER"));
+      JwtAuthToken jwtAuthToken = new JwtAuthToken(user.getId(), user.getPassword(), createAuthorityList("ROLE_USER"));
       // detail에는 반환될 정보를 담아서 준다
-      jwtAuthToken.setDetails(new AuthResult(jwtTokenProvider.createToken(user.getId()), jwtTokenProvider.createRefreshToken(user.getId())));
+      jwtAuthToken.setDetails(new AuthResult(jwtTokenProvider.createToken(user.getId()), jwtTokenProvider.createRefreshToken(user.getId()), user));
 
       return jwtAuthToken;
     }

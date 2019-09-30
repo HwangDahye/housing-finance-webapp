@@ -8,13 +8,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hdh.housingfinancewebapp.component.CsvComponent;
 import com.hdh.housingfinancewebapp.component.LinearRegressionComponent;
 import com.hdh.housingfinancewebapp.component.ResponseComponent;
-import com.hdh.housingfinancewebapp.dto.AmountOfYear;
+import com.hdh.housingfinancewebapp.dto.TotalAmountGroupbyYearBankDto;
 import com.hdh.housingfinancewebapp.dto.response.ObjectResult;
-import com.hdh.housingfinancewebapp.dto.response.finance.AvgAmountResult;
-import com.hdh.housingfinancewebapp.dto.response.finance.AvgAmountResultItem;
+import com.hdh.housingfinancewebapp.dto.response.finance.MinMaxAvgAmountResult;
+import com.hdh.housingfinancewebapp.dto.response.finance.MinMaxAvgAmountResultItem;
 import com.hdh.housingfinancewebapp.dto.response.finance.PredictResult;
 import com.hdh.housingfinancewebapp.dto.response.finance.TopBankResult;
-import com.hdh.housingfinancewebapp.dto.response.finance.TotalAmountResult;
+import com.hdh.housingfinancewebapp.dto.response.finance.TotalEachYearResult;
+import com.hdh.housingfinancewebapp.dto.response.finance.TotalEachYearResultContent;
 import com.hdh.housingfinancewebapp.entity.Bank;
 import com.hdh.housingfinancewebapp.entity.CreditGuaranteeHistory;
 import com.hdh.housingfinancewebapp.entity.CreditGuaranteeHistoryPK;
@@ -22,7 +23,6 @@ import com.hdh.housingfinancewebapp.exception.CsvFileReadException;
 import com.hdh.housingfinancewebapp.repository.BankRepository;
 import com.hdh.housingfinancewebapp.repository.CreditGuaranteeHistoryRepository;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -31,12 +31,16 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+@Log4j2
 @Service
 public class FinanceService {
+
   @Autowired
   ObjectMapper objectMapper;
 
@@ -73,9 +77,15 @@ public class FinanceService {
   @Value("${csv.file.bank.month.cell.idx}")
   int csvMonthIdx;
 
-  private final int PREDICT_YEAR = 2018;
+  private static final int PREDICT_YEAR = 2018;
+  private static final String BANK_CODE_PREFIX = "bnk";
+
+  private List<Bank> banks;
 
   public ObjectResult<List<CreditGuaranteeHistory>> load(){
+    clearData();
+
+    // read csv file
     List<List<String>> records;
     try{
       records = csvComponent.readCSV(csvFIleName);
@@ -83,33 +93,33 @@ public class FinanceService {
       throw new CsvFileReadException(e);
     }
 
-    // TODO 이거 필요한걸까?
-    List<Bank> banks = records.get(csvHeaderRow)
-                                      .subList(csvBankStartIdx, records.get(0).size())
-                                      .stream().map(item -> new Bank(item, item)).collect(Collectors.toList());
-//    bankRepository.saveAll(banks);
+    // create bank list
+    List<String> bankNames = records.get(csvHeaderRow).subList(csvBankStartIdx, records.get(0).size());
+    banks = createBanks(bankNames);
+    bankRepository.saveAll(banks);
 
+    // create history list
     records = records.subList(csvDataRow, records.size());
 
-    List<CreditGuaranteeHistory> creditGuaranteeHistoryList = new ArrayList<>();
+    List<CreditGuaranteeHistory> historyList = new ArrayList<>();
 
     // TODO : 더 좋은 방법이 있을까?
     for(List<String> columns : records){
       int year = Integer.parseInt(columns.get(csvYearIdx));
       int month = Integer.parseInt(columns.get(csvMonthIdx));
 
-      for(int idx = 0; idx < banks.size(); idx++){
-        String bank = banks.get(idx).getInstituteCode();
-        int amount = Integer.parseInt(columns.get(csvBankStartIdx + idx));
+      historyList.addAll(IntStream.range(0, banks.size())
+                            .mapToObj(idx ->
+                                new CreditGuaranteeHistory(
+                                    new CreditGuaranteeHistoryPK(year, month, banks.get(idx)),
+                                    Integer.parseInt(columns.get(csvBankStartIdx + idx)))
+                            ).collect(Collectors.toList()));
 
-        CreditGuaranteeHistory history = new CreditGuaranteeHistory(new CreditGuaranteeHistoryPK(year, month, bank) ,amount);
-        creditGuaranteeHistoryList.add(history);
-      }
     }
 
-    if(creditGuaranteeHistoryList.size() > 0){
-      historyRepo.saveAll(creditGuaranteeHistoryList);
-      return responseComponent.getSuccessObjectResult(creditGuaranteeHistoryList);
+    if(historyList.size() > 0){
+      historyRepo.saveAll(historyList);
+      return responseComponent.getSuccessObjectResult(historyList);
     }else{
       return responseComponent.getFailObjectResult(FAIL_SAVE_CSV_DATA.getCode(), FAIL_SAVE_CSV_DATA.getMsg());
     }
@@ -124,72 +134,76 @@ public class FinanceService {
     return responseComponent.getSuccessObjectResult(banks);
   }
 
-  public ObjectResult<List<TotalAmountResult>> getTotalAmountOfYear(){
-    List<TotalAmountResult> results = new ArrayList<>();
+  public ObjectResult<TotalEachYearResult> getTotalEachYear(){
+    List<TotalEachYearResultContent> contents = new ArrayList<>();
 
-    List<Object[]> repoResults = historyRepo.getTotalAmountOfYear();
+    List<TotalAmountGroupbyYearBankDto> totalList = historyRepo.getTotalAmountGroupbyYearBank();
 
-    if(repoResults.size() == 0){
+    if(totalList.size() == 0){
       return responseComponent.getFailObjectResult(FAIL_DB_RESULT_EMPTY.getCode(), FAIL_DB_RESULT_EMPTY.getMsg());
     }
 
-    TreeMap<Integer, List<AmountOfYear>> totalAmountGroupByYearMap = repoResults.stream().map(obj -> new AmountOfYear((int) obj[0],(String) obj[1],((BigInteger) obj[2]).intValue()))
-                                                                        .collect(Collectors.groupingBy(AmountOfYear::getYear, TreeMap::new, Collectors.toList()));
+    TreeMap<Integer, List<TotalAmountGroupbyYearBankDto>> taMap = totalList.stream().collect(Collectors.groupingBy(TotalAmountGroupbyYearBankDto::getYear, TreeMap::new, Collectors.toList()));
 
+    taMap.entrySet().stream().forEach(entry -> {
+      List<TotalAmountGroupbyYearBankDto> taList = entry.getValue();
 
-    totalAmountGroupByYearMap.entrySet().stream().forEach(entry -> {
-      List<AmountOfYear> amountOfYearList = entry.getValue();
+      int totalAmount = taList.stream().collect(Collectors.summingInt(TotalAmountGroupbyYearBankDto::getTotalAmount));
+      Map<String, Integer> detailAmount = taList.stream().collect(Collectors.toMap(TotalAmountGroupbyYearBankDto::getBank, TotalAmountGroupbyYearBankDto::getTotalAmount));
 
-      int totalAmount = amountOfYearList.stream().collect(Collectors.summingInt(AmountOfYear::getTotalAmountOfBank));
-      Map<String, Integer> detailAmount = amountOfYearList.stream().collect(Collectors.toMap(AmountOfYear::getBank, AmountOfYear::getTotalAmountOfBank));
-
-      results.add(new TotalAmountResult(entry.getKey(), totalAmount, detailAmount));
+      contents.add(new TotalEachYearResultContent(entry.getKey(), totalAmount, detailAmount));
     });
 
-    if(results.size() == 0){
+    if(contents.size() == 0){
       return responseComponent.getFailObjectResult(FAIL_TOTAL_AMOUNT_OF_YEAR.getCode(), FAIL_TOTAL_AMOUNT_OF_YEAR.getMsg());
     }
-    return responseComponent.getSuccessObjectResult(results);
+
+    TotalEachYearResult result = new TotalEachYearResult("주택금융 공급현황", contents);
+    return responseComponent.getSuccessObjectResult(result);
   }
 
-  public ObjectResult<TopBankResult> getTopInstitution(){
+  public ObjectResult<TopBankResult> getTopBank(){
     TopBankResult result = new TopBankResult();
 
-    List<Object[]> repoResults = historyRepo.getTotalAmountOfYear();
+    List<TotalAmountGroupbyYearBankDto> totalList = historyRepo.getTotalAmountGroupbyYearBank();
 
-    if(repoResults.size() == 0){
+    if(totalList.size() == 0){
       return responseComponent.getFailObjectResult(FAIL_DB_RESULT_EMPTY.getCode(), FAIL_DB_RESULT_EMPTY.getMsg());
     }
 
-    AmountOfYear top = repoResults.stream().map(obj-> new AmountOfYear((int) obj[0], (String) obj[1],((BigInteger) obj[2]).intValue()))
-                                            .max(Comparator.comparing(AmountOfYear::getTotalAmountOfBank))
+    TotalAmountGroupbyYearBankDto top = totalList.stream()
+                                            .max(Comparator.comparing(TotalAmountGroupbyYearBankDto::getTotalAmount))
                                             .orElseThrow(NoSuchElementException::new);
     result.setBank(top.getBank());
     result.setYear(top.getYear());
     return responseComponent.getSuccessObjectResult(result);
   }
 
-  public ObjectResult<AvgAmountResult> getMaxAndMinAvgAmountOfYear(String bank){
-    AvgAmountResult result = new AvgAmountResult();
-    List<Object[]> repoResults = historyRepo.getTotalAmountOfYear();
+  public ObjectResult<MinMaxAvgAmountResult> getMinMaxAvgAmount(String bank){
+    MinMaxAvgAmountResult result = new MinMaxAvgAmountResult();
+    List<TotalAmountGroupbyYearBankDto> totalList = historyRepo.getTotalAmountGroupbyYearBank();
 
-    if(repoResults.size() == 0){
+    if(totalList.size() == 0){
       return responseComponent.getFailObjectResult(FAIL_DB_RESULT_EMPTY.getCode(), FAIL_DB_RESULT_EMPTY.getMsg());
     }
 
-    List<AmountOfYear> avgListByBank = repoResults.stream()
-        .filter(obj -> (obj[1]).equals(bank))
-        .filter(obj -> (int) obj[0] < 2017)
-        .map(obj -> new AmountOfYear((int) obj[0],(String) obj[1], Math.round( ((BigInteger) obj[2]).floatValue() / 12)) )
+    List<TotalAmountGroupbyYearBankDto> avgListByBank = totalList.stream()
+        .filter(obj -> obj.getBank().equals(bank))
+        .filter(obj -> obj.getYear() < 2017)
+        .map(obj -> {
+          int avg = Math.round(obj.getTotalAmount().floatValue() / 12);
+          obj.setTotalAmount(avg);
+          return obj;
+        })
         .collect(Collectors.toList());
 
 
-    AmountOfYear min = avgListByBank.stream().min(Comparator.comparing(AmountOfYear::getTotalAmountOfBank)).orElseThrow(NoSuchElementException::new);;
-    AmountOfYear max = avgListByBank.stream().max(Comparator.comparing(AmountOfYear::getTotalAmountOfBank)).orElseThrow(NoSuchElementException::new);;
+    TotalAmountGroupbyYearBankDto min = avgListByBank.stream().min(Comparator.comparing(TotalAmountGroupbyYearBankDto::getTotalAmount)).orElseThrow(NoSuchElementException::new);
+    TotalAmountGroupbyYearBankDto max = avgListByBank.stream().max(Comparator.comparing(TotalAmountGroupbyYearBankDto::getTotalAmount)).orElseThrow(NoSuchElementException::new);
 
 
     result.setBank(bank);
-    result.setSupportAmount(Arrays.asList(new AvgAmountResultItem(min), new AvgAmountResultItem(max)));
+    result.setSupport_amount(Arrays.asList(new MinMaxAvgAmountResultItem(min), new MinMaxAvgAmountResultItem(max)));
 
     return responseComponent.getSuccessObjectResult(result);
   }
@@ -198,7 +212,7 @@ public class FinanceService {
     Bank bankObj = bankRepository.findByInstituteName(bank);
 
     List<CreditGuaranteeHistory> datasOfSpecificBank = historyRepo.findAll().stream()
-        .filter(item -> item.getPk().getBank().equals(bank))
+        .filter(item -> item.getPk().getBank().getInstituteName().equals(bank))
         .filter(item -> item.getPk().getMonth() == month)
         .collect(Collectors.toList());
 
@@ -211,9 +225,22 @@ public class FinanceService {
 
     linearRegressionComponent.process(years, amounts);
 
+    log.info("linearRegression Hypothesis Function = {}", linearRegressionComponent.toString());
+
     int predictResult = linearRegressionComponent.predict(PREDICT_YEAR);
     PredictResult result = new PredictResult(bankObj.getInstituteCode(), PREDICT_YEAR, month, predictResult);
 
     return responseComponent.getSuccessObjectResult(result);
+  }
+
+  private void clearData(){
+    historyRepo.deleteAll();
+    bankRepository.deleteAll();
+  }
+
+  private List<Bank> createBanks(List<String> bankNames){
+    List<Bank> results = IntStream.range(0, bankNames.size()).mapToObj(idx -> new Bank(BANK_CODE_PREFIX.concat(String.format("%03d", idx)), bankNames.get(idx))).collect(Collectors.toList());
+    log.debug("createBanks result => {}", results);
+    return results;
   }
 }

@@ -1,5 +1,6 @@
-package com.hdh.housingfinancewebapp.dto;
+package com.hdh.housingfinancewebapp.dto.response.finance;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,8 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AmountOfYear {
-  private int year;
+public class MinMaxAvgAmountResult {
   private String bank;
-  private int totalAmountOfBank;
+  private List<MinMaxAvgAmountResultItem> support_amount;
 }

@@ -8,13 +8,14 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AuthEntryPoint implements AuthenticationEntryPoint {
+public class AuthEntryPoint implements AuthenticationEntryPoint {   // 인증이 되지 않았을 경우, 발생하는 Exception Handling
 
   @Autowired
   ObjectMapper objectMapper;
@@ -22,8 +23,6 @@ public class AuthEntryPoint implements AuthenticationEntryPoint {
   @Autowired
   ResponseComponent responseComponent;
 
-  // auth exception handling하는 친구, security configure에 정의되어 있음
-  // Filter에서 validateToken 실패하니까 여기로 빠짐
   @Override
   public void commence(HttpServletRequest request, HttpServletResponse response,
       AuthenticationException ex) throws IOException {
@@ -32,7 +31,7 @@ public class AuthEntryPoint implements AuthenticationEntryPoint {
             ResponseCodeEnums.AUTH_FAIL_EXCEPTION.getMsg());
 
     response.setStatus(HttpStatus.UNAUTHORIZED.value());
-    response.setHeader("content-type", "application/json");
+    response.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
     response.setCharacterEncoding("UTF-8");
     response.getWriter().write(objectMapper.writeValueAsString(result));
     response.getWriter().flush();
