@@ -2,8 +2,8 @@
 
 ### How to run
 
-1. download runnable jar file : [jar download](https://github.com/HwangDahye/housing-finance-webapp/raw/master/out/housing-finance-webapp-1.0.0.jar)
-2. run script on terminal  ```java -jar housing-finance-webapp-1.0.0.jar```
+1. download runnable jar file : [jar download](https://github.com/HwangDahye/housing-finance-webapp/raw/master/out/housing-finance-webapp-0.0.1.jar)
+2. run script on terminal  ```java -jar housing-finance-webapp-0.0.1.jar```
 3. access [http://localhost:8080](http://localhost:8080)
 
 **Sample Accounts**
