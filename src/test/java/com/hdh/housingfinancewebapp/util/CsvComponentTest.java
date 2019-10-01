@@ -8,6 +8,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -21,7 +23,8 @@ public class CsvComponentTest {
   @Test
   public void csvComponentTest(){
     try {
-      List<List<String>> records = csvComponent.readCSV(fileName);
+      Resource resource = new ClassPathResource("/assets/"+fileName);
+      List<List<String>> records = csvComponent.readCSV(resource.getInputStream());
       records.stream().map(columns -> String.join(",", columns)).forEach(System.out::println);
     }catch (IOException e){
       e.printStackTrace();

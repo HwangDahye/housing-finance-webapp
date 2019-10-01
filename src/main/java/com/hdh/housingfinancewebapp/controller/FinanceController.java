@@ -50,8 +50,8 @@ public class FinanceController {
     return financeService.getTopBank();
   }
 
-  @GetMapping(path = {"/minmax/avg/amount", "/minmax/avg/amount/{bank}"})
-  public ObjectResult<MinMaxAvgAmountResult> getMinMaxAvgAmount(@PathVariable("bank") Optional<String> bank){
+  @GetMapping(path = "/minmax/avg/amount")
+  public ObjectResult<MinMaxAvgAmountResult> getMinMaxAvgAmount(@RequestParam(value="bank", required = false) Optional<String> bank){
     // TODO : 한글 깨짐
 //    bank.orElse(defaultBank);
     return financeService.getMinMaxAvgAmount(bank.isPresent() ? bank.get() : "외환은행");

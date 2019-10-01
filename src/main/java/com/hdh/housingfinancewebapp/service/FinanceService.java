@@ -3,6 +3,8 @@ package com.hdh.housingfinancewebapp.service;
 import static com.hdh.housingfinancewebapp.enums.ResponseCodeEnums.FAIL_DB_RESULT_EMPTY;
 import static com.hdh.housingfinancewebapp.enums.ResponseCodeEnums.FAIL_SAVE_CSV_DATA;
 import static com.hdh.housingfinancewebapp.enums.ResponseCodeEnums.FAIL_TOTAL_AMOUNT_OF_YEAR;
+import static com.hdh.housingfinancewebapp.enums.ResponseCodeEnums.INVALID_MONTH_PARAM;
+import static com.hdh.housingfinancewebapp.enums.ResponseCodeEnums.NOT_EXIST_BANK_PARAM;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hdh.housingfinancewebapp.component.CsvComponent;
@@ -35,6 +37,8 @@ import java.util.stream.IntStream;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 @Log4j2
@@ -85,10 +89,12 @@ public class FinanceService {
   public ObjectResult<List<CreditGuaranteeHistory>> load(){
     clearData();
 
+    Resource resource = new ClassPathResource("/assets/"+csvFIleName);
+
     // read csv file
     List<List<String>> records;
     try{
-      records = csvComponent.readCSV(csvFIleName);
+      records = csvComponent.readCSV(resource.getInputStream());
     }catch (IOException e){
       throw new CsvFileReadException(e);
     }
@@ -126,12 +132,14 @@ public class FinanceService {
   }
 
   public ObjectResult<Map<String, String>> getBanks(){
-    Map<String, String> banks = bankRepository.findAll().stream()
+    Map<String, String> banks = bankRepository.findAllByOrderByInstituteCodeAsc().stream()
                                         .collect(Collectors.toMap(Bank::getInstituteCode, Bank::getInstituteName));
+
     if(banks.size() == 0){
       return responseComponent.getFailObjectResult(FAIL_DB_RESULT_EMPTY.getCode(), FAIL_DB_RESULT_EMPTY.getMsg());
     }
-    return responseComponent.getSuccessObjectResult(banks);
+    TreeMap<String, String> results = new TreeMap<>(banks);
+    return responseComponent.getSuccessObjectResult(results);
   }
 
   public ObjectResult<TotalEachYearResult> getTotalEachYear(){
@@ -180,6 +188,10 @@ public class FinanceService {
   }
 
   public ObjectResult<MinMaxAvgAmountResult> getMinMaxAvgAmount(String bank){
+    if(!isExistBank(bank)){
+      return responseComponent.getFailObjectResult(NOT_EXIST_BANK_PARAM.getCode(), NOT_EXIST_BANK_PARAM.getMsg());
+    }
+
     MinMaxAvgAmountResult result = new MinMaxAvgAmountResult();
     List<TotalAmountGroupbyYearBankDto> totalList = historyRepo.getTotalAmountGroupbyYearBank();
 
@@ -209,6 +221,14 @@ public class FinanceService {
   }
 
   public ObjectResult<PredictResult> doPredict(String bank, int month){
+    if(!isExistBank(bank)){
+      return responseComponent.getFailObjectResult(NOT_EXIST_BANK_PARAM.getCode(), NOT_EXIST_BANK_PARAM.getMsg());
+    }
+
+    if(month < 1 || month > 12){
+      return responseComponent.getFailObjectResult(INVALID_MONTH_PARAM.getCode(), INVALID_MONTH_PARAM.getMsg());
+    }
+
     Bank bankObj = bankRepository.findByInstituteName(bank);
 
     List<CreditGuaranteeHistory> datasOfSpecificBank = historyRepo.findAll().stream()
@@ -242,5 +262,10 @@ public class FinanceService {
     List<Bank> results = IntStream.range(0, bankNames.size()).mapToObj(idx -> new Bank(BANK_CODE_PREFIX.concat(String.format("%03d", idx)), bankNames.get(idx))).collect(Collectors.toList());
     log.debug("createBanks result => {}", results);
     return results;
+  }
+
+  private boolean isExistBank(String bank){
+    Bank findResult = bankRepository.findByInstituteName(bank);
+    return findResult != null ? true : false;
   }
 }

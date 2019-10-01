@@ -15,7 +15,10 @@ public enum ResponseCodeEnums {
   FAIL_READ_CSV(-2001, "csv 파일 읽기 도중 에러가 발생하였습니다."),
   FAIL_SAVE_CSV_DATA(-2002, "csv 파일 파싱결과가 존재하지 않습니다."),
   FAIL_TOTAL_AMOUNT_OF_YEAR(-2003, "년도별 각 기관의 합계 연산 결과가 존재하지 않습니다"),
-  FAIL_DB_RESULT_EMPTY(-2004, "DB 조회 결과가 존재하지 않습니다");
+  FAIL_DB_RESULT_EMPTY(-2004, "DB 조회 결과가 존재하지 않습니다"),
+  NOT_EXIST_BANK_PARAM(-2005, "입력한 은행의 데이터가 존재하지 않습니다."),
+  INVALID_MONTH_PARAM(-2006, "입력한 월(month)의 정보가 타당하지 않습니다");
+
 
   private int code;
   private String msg;
