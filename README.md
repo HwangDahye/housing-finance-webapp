@@ -15,6 +15,8 @@
 ### Api document (Postman)  
 [Api document open on postman web](https://documenter.getpostman.com/view/8237099/SVtN3Wzx)
 
+### Preview  
+![login.PNG](./img/login.PNG)  ![home.PNG](./img/home.PNG)
 ### Library & Opensource
 |Project name|Version|Purpose|Link|
 |:-----------|:------|:------|:---|
