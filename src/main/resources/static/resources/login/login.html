@@ -1,0 +1,25 @@
+<div>
+  <div class="login-page" style="display: block;">
+    <div class="form">
+      <!--<form action="/signup" method="POST" class="sign register-form">-->
+      <div class="sign register-form">
+        <h2>With Me !</h2>
+        <input type="text" name="id" placeholder="id"/>
+        <input type="password" name="password" placeholder="password"/>
+        <input ng-type="text" name="name" placeholder="name"/>
+        <button ng-click="join()" type="button" class="btn btn-outline-warning">Join Us</button>
+        <!--<button name="submit" type="submit" class="btn btn-outline-warning">Join Us</button>-->
+        <p class="message">Already registered? <a style="cursor: pointer">Sign In</a></p>
+      </div>
+      <!--<form action="/signin" class="sign login-form">-->
+      <div class="sign login-form">
+        <h2>Hello~Kakao!</h2>
+        <input type="text" name="id" placeholder="id"/>
+        <input type="password" name="password" placeholder="password"/>
+        <button ng-click="login()" type="button" class="btn btn-outline-dark">Login</button>
+        <!--<button name="submit" type="submit" class="btn btn-outline-dark">Login</button>-->
+        <p class="message">Not registered? <a style="cursor: pointer">Create an account</a></p>
+      </div>
+    </div>
+  </div>
+</div>

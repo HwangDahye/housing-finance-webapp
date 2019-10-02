@@ -31,20 +31,20 @@ public class LoginRestController {
   private JwtTokenProvider jwtTokenProvider;
   @Autowired private LoginService loginService;
 
-  @PostMapping(path={"/signup"})
+  @PostMapping(path="/signup")
   public CommonResult signup(@RequestBody @Valid SignUpReq signUpReq, HttpServletResponse res) throws DuplicatedUserException {
     CommonResult result = loginService.doSignUp(signUpReq);
     res.setStatus(HttpStatus.CREATED.value());
     return result;
   }
 
-  @GetMapping(path={"/signin"})
+  @GetMapping(path="/signin")
   public ObjectResult<AuthResult> signin(@RequestParam String id, @RequestParam String password)
       throws UserNotFoundException, SigninFailedException, IllegalArgumentException{
     return loginService.doSignIn(id, password);
   }
 
-  @GetMapping(path={"/refresh/token"})
+  @GetMapping(path="/refresh/token")
   public ObjectResult<AuthResult> refreshToken(@RequestParam String id,  HttpServletRequest req) throws AuthRequestException {
     String refreshToken = jwtTokenProvider.resolveToken(req);
     return loginService.reissueAccessToken(id, refreshToken);

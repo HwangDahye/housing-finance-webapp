@@ -1,0 +1,44 @@
+<div class="home-page">
+  <div class="top">
+    <button class="btn btn-primary" style="float: right;font-size: small;margin:10px;" ng-click="logout()"> logout </button>
+    <!--<h5 style="float: right;">{{userId}}님 반갑습니다!</h5>-->
+    <span style="margin: 10px;line-height: 3.3">
+      <span style="font-size: 16px;"><strong>{{userId}}님</strong> 반갑습니다!</span>
+      <span style="font-size: 12px;">(인증만료까지 남은시간 <span id="minutes"></span>분 <span id="seconds"></span>초
+        <button class="btn btn-success" style="line-height: 1;font-size: xx-small;margin: 10px;" ng-click="tokenReissue()"> 재발급 </button>
+        )</span>
+    </span>
+  </div>
+  <div class="middle">
+    <h2 class="home-h2" style="color:#0d3862">Housing Finance Service - ver0.0.1</h2>
+    <button class="btn btn-secondary" ng-click="load()"> CSV File Load(*Require) </button>
+    <button ng-show="csvLoad" class="btn btn-secondary" ng-click="getBanks()" > Get bank List </button>
+    <button ng-show="!csvLoad" class="btn btn-secondary" disabled> Get bank List </button>
+    <button ng-show="csvLoad"  class="btn btn-secondary" ng-click="getTotalSum()"> Get the total sum of the bank's yearly </button>
+    <button ng-show="!csvLoad" class="btn btn-secondary" disabled> Get the total sum of the bank's yearly </button>
+    <button ng-show="csvLoad"  class="btn btn-secondary" ng-click="getTopOfBank()"> Get the top of bank </button>
+    <button ng-show="!csvLoad" class="btn btn-secondary" disabled> Get the top of bank </button>
+    <button ng-show="csvLoad"  class="btn btn-secondary" ng-click="getMinMaxAvgClicked=true;doPredictClicked=false;viewClear()"> Get the maximum and minimum value of bank </button>
+    <button ng-show="!csvLoad" class="btn btn-secondary" disabled> Get the maximum and minimum value of bank </button>
+    <button ng-show="csvLoad"  class="btn btn-secondary" ng-click="doPredictClicked=true;getMinMaxAvgClicked=false;viewClear()"> Let's predict! </button>
+    <button ng-show="!csvLoad" class="btn btn-secondary" disabled> Let's predict! </button>
+
+    <div class="middle-response">
+      <div class="middle-extra" ng-show="doPredictClicked">
+        지난 2005년~2017년의 데이터를 기반으로 2018년도의 지원금액을 예측해봅시다! </br>
+        예측하고싶은 은행명과 월(month)을 입력 해 주세요.(필수)</br>
+        <input type="text" name="bank" placeholder="은행명" />
+        <input type="text" name="month" placeholder="월(month)" />
+        <button class="btn btn-info" ng-click="doPredict()"> Request! </button> <span ng-show="predictParamWarning" style="color: red;">※ 입력값은 필수입니다</span>
+      </div>
+      <div class="middle-extra" ng-show="getMinMaxAvgClicked">
+        특정 은행의 년도별 평균금액 최대/최소 값을 구해옵니다. 입력값이 없을 경우 기본값('외환은행')으로 요청됩니다.</br>
+        <input type="text" name="minMaxBank" placeholder="은행명" />
+        <button class="btn btn-info" ng-click="getMinMaxAvg()"> Request! </button>
+      </div>
+      <pre id="json-renderer" class="json-viewer"></pre>
+    </div>
+  </div>
+
+  <div class="bottom">
+</div>
