@@ -1,23 +1,9 @@
 
 var app = angular.module("myApp",[
-  'ngRoute'
-    ,'auth','home','login'
-  ,'ui.bootstrap'
-  ,'brantwills.paging'
+  'ngRoute','auth','home','login'
 ]);
 app.controller('controller', function($scope, $filter){
-  $scope.commonData = {};
-  $scope.SIGN_IN_URL = "http://localhost:8080/api/auth/signin";
-  $scope.SIGN_UP_URL = "http://localhost:8080/api/auth/signup";
-  $scope.MAIN_HOME_URL = "http://localhost:8080/#/home";
-
-  // 삭제했어야 했는데 ㅠㅠ
-  $scope.clickfuntion = function(){
-    var time = $filter('date')(new Date(), 'yyyy-MM-dd HH:mm:ss Z');
-    $scope.welcome = "Time = "+time;
-  }
 });
-
 
 app.run(function(auth){
   auth.init('/', '/login', '/logout');

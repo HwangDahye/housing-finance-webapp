@@ -40,7 +40,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {   // �
           .authorizeRequests() // 다음 리퀘스트에 대한 사용권한 체크
           .antMatchers("/","/login").permitAll()
           .antMatchers("/api/auth/**").permitAll()
-          .antMatchers("/h2-console/**").permitAll()
+          .antMatchers("/h2-console/**","/favicon.ico").permitAll()
           .antMatchers("/api/finance/**").hasRole("USER")
           .antMatchers("/resources/**").permitAll().anyRequest().permitAll()
           .anyRequest().authenticated()

@@ -149,6 +149,7 @@ angular.module('home', ['auth']).controller('homeCtrl', function($scope, $http, 
   }
 
   $scope.logout = function(){
+    clearInterval(timer);
     auth.clear();
   }
 
