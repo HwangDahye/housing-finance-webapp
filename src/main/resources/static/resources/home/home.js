@@ -1,4 +1,4 @@
-angular.module('home', ['auth']).controller('homeCtrl', function($scope, $http, auth){
+angular.module('home', ['auth']).controller('homeCtrl', function($scope, $http, $location, auth){
   const LOAD_URI = "/api/finance/load";
   const GET_BANKS_URI = "/api/finance/banks";
   const GET_TOTAL_AMOUNT_URI = "/api/finance/total/amount";
@@ -220,5 +220,20 @@ angular.module('home', ['auth']).controller('homeCtrl', function($scope, $http, 
       }
       else { console.log("Login failed"); $scope.error = true; }
     });
-  }
+  };
+
+  var currentLocation = $location.url();
+  $scope.$on("$locationChangeSuccess", function handleLocationChangeStartEvent(event) {
+    currentLocation = $location.url();
+  });
+
+  $scope.$on("$locationChangeStart", function(event){
+    event.preventDefault();
+    var targetPath = $location.path();
+    if (currentLocation != targetPath)
+    {
+      clearInterval(timer);
+      auth.clear();
+    }
+  });
 });
