@@ -33,6 +33,8 @@ Front-End : AngularJS v1.3.9
 |Lombok|-|Automatically set getter,setter and constructor|[Link](https://projectlombok.org)|
 |Jjwt|0.9.1|JSON Web Token|[Link](https://github.com/jwtk/jjwt)|
 
+### ERD  
+![erd.PNG](./img/erd.png)  
 
 ### File Structure  
 ```
