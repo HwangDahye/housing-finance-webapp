@@ -31,8 +31,7 @@ public class UserService {
   }
 
   public User saveUser(SignUpReq signUpReq){
-    return userRepository.save(User.builder().id(signUpReq.getId()).password(passwordEncoder.encode(signUpReq.getPassword())).name(signUpReq.getName()).createDatetime(LocalDateTime
-        .now()).build());
+    return userRepository.save(new User(signUpReq.getId(), passwordEncoder.encode(signUpReq.getPassword()), signUpReq.getName()));
   }
 
   public User saveUser(User user){

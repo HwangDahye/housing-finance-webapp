@@ -2,11 +2,12 @@ package com.hdh.housingfinancewebapp.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.sql.Timestamp;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,5 +33,13 @@ public class Bank {
   public Bank(String instituteCode, String instituteName){
     this.instituteCode = instituteCode;
     this.instituteName = instituteName;
+  }
+
+  @PrePersist
+  public void prePersist(){
+    if(createDatetime == null)
+      createDatetime = new Timestamp(new Date().getTime());
+    if(useYn == '\u0000')
+      useYn = 'Y';
   }
 }
