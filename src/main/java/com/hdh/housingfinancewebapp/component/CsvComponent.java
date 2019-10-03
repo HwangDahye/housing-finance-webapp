@@ -1,7 +1,6 @@
 package com.hdh.housingfinancewebapp.component;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -14,9 +13,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CsvComponent {
-  private final String COMMA_PATTERN = ",(?=([^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*$)";
-  private final String ETC_STRINGS = "[ !@#$%^&*(),.?\\\":{}|<>]";
-  private final String CURRENCY_UNIT_TEXT = "1\\)\\(억원\\)|\\(억원\\)";
+  private static final String COMMA_PATTERN = ",(?=([^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*$)";
+  private static final String ETC_STRINGS = "[ !@#$%^&*(),.?\\\":{}|<>]";
+  private static final String CURRENCY_UNIT_TEXT = "1\\)\\(억원\\)|\\(억원\\)";
 
   public List<List<String>> readCSV(InputStream inputStream) throws IOException {
     List<List<String>> records = new ArrayList<>();

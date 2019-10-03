@@ -10,7 +10,6 @@ import com.hdh.housingfinancewebapp.service.FinanceService;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@Log4j2
 @RestController
 @RequestMapping("/api/finance")
 public class FinanceController {
@@ -52,7 +50,6 @@ public class FinanceController {
   @GetMapping(path = "/minmax/avg/amount")
   public ObjectResult<MinMaxAvgAmountResult> getMinMaxAvgAmount(@RequestParam(value="bank", required = false) Optional<String> bank){
     // TODO : 한글 깨짐
-//    bank.orElse(defaultBank);
     return financeService.getMinMaxAvgAmount(bank.isPresent() ? bank.get() : "외환은행");
   }
 

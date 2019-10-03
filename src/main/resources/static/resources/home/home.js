@@ -7,6 +7,7 @@ angular.module('home', ['auth']).controller('homeCtrl', function($scope, $http, 
   const PREDICT_URI = "/api/finance/predict";
   const BEARER_TYPE = "Bearer";
 
+  var currentLocation = $location.url();
   var accessToken = localStorage.getItem('accessToken');
   var refreshToken = localStorage.getItem('refreshToken');
   var headers = {"Authorization" : BEARER_TYPE+" "+accessToken};
@@ -19,6 +20,68 @@ angular.module('home', ['auth']).controller('homeCtrl', function($scope, $http, 
   $scope.getMinMaxAvgClicked = false;
   $scope.predictParamWarning = false;
 
+  var requestFail = function(res){
+    printResult(res);
+  };
+  var requestError = function(){
+
+  };
+  var printResult = function(data){
+    if(viewer == null){
+      viewer =new JsonEditor('#json-renderer', data);
+      return;
+    }
+    viewer.load(data);
+  }
+  var parseJwt = function() {
+    var base64Url = accessToken.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+  };
+  var timerSetting = function(){
+    var decode = parseJwt();
+    var compareDate = new Date(decode.exp *1000);
+
+
+    timer = setInterval(function() {
+      timeBetweenDates(compareDate);
+    }, 1000);
+  };
+  var timeBetweenDates = function(toDate) {
+    var dateEntered = toDate;
+    var now = new Date();
+    var difference = dateEntered.getTime() - now.getTime();
+
+    if (difference <= 0) {
+      clearInterval(timer);
+      // Timer done
+      if(confirm("인증이 만료되었습니다. 연장하시겠습니까?")){
+        $scope.tokenReissue();
+        return;
+      }else{
+        auth.clear();
+      }
+    } else {
+
+      var seconds = Math.floor(difference / 1000);
+      var minutes = Math.floor(seconds / 60);
+      var hours = Math.floor(minutes / 60);
+      var days = Math.floor(hours / 24);
+
+      hours %= 24;
+      minutes %= 60;
+      seconds %= 60;
+
+      // $("#days").text(days);
+      // $("#hours").text(hours);
+      $("#minutes").text(minutes);
+      $("#seconds").text(seconds);
+    }
+  };
   $scope.load = function(){
     $scope.doPredictClicked=false;
     $scope.getMinMaxAvgClicked = false;
@@ -127,89 +190,13 @@ angular.module('home', ['auth']).controller('homeCtrl', function($scope, $http, 
       if(err.status == 401) auth.clear();
     });
   };
-
-  requestFail = function(res){
-    printResult(res);
-  };
-
-  requestError = function(){
-
-  };
-
-  printResult = function(data){
-    if(viewer == null){
-      viewer =new JsonEditor('#json-renderer', data);
-      return;
-    }
-    viewer.load(data);
-  }
-
   $scope.viewClear = function(){
     viewer.load(null);
   }
-
   $scope.logout = function(){
     clearInterval(timer);
     auth.clear();
   }
-
-  parseJwt = function() {
-    var base64Url = accessToken.split('.')[1];
-    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
-
-    return JSON.parse(jsonPayload);
-  };
-
-
-
-  var timerSetting = function(){
-    var decode = parseJwt();
-    var compareDate = new Date(decode.exp *1000);
-
-
-    timer = setInterval(function() {
-      timeBetweenDates(compareDate);
-    }, 1000);
-  };
-
-  var timeBetweenDates = function(toDate) {
-    var dateEntered = toDate;
-    var now = new Date();
-    var difference = dateEntered.getTime() - now.getTime();
-
-    if (difference <= 0) {
-      clearInterval(timer);
-      // Timer done
-      if(confirm("인증이 만료되었습니다. 연장하시겠습니까?")){
-        $scope.tokenReissue();
-        return;
-      }else{
-        auth.clear();
-      }
-    } else {
-
-      var seconds = Math.floor(difference / 1000);
-      var minutes = Math.floor(seconds / 60);
-      var hours = Math.floor(minutes / 60);
-      var days = Math.floor(hours / 24);
-
-      hours %= 24;
-      minutes %= 60;
-      seconds %= 60;
-
-      // $("#days").text(days);
-      // $("#hours").text(hours);
-      $("#minutes").text(minutes);
-      $("#seconds").text(seconds);
-    }
-  };
-
-  $(document).ready(function() {
-    timerSetting();
-  });
   $scope.tokenReissue = function(){
     clearInterval(timer);
     auth.reissue($scope.userId, refreshToken, function(authenticated) {
@@ -221,19 +208,19 @@ angular.module('home', ['auth']).controller('homeCtrl', function($scope, $http, 
       else { console.log("Login failed"); $scope.error = true; }
     });
   };
-
-  var currentLocation = $location.url();
   $scope.$on("$locationChangeSuccess", function handleLocationChangeStartEvent(event) {
     currentLocation = $location.url();
   });
-
   $scope.$on("$locationChangeStart", function(event){
-    event.preventDefault();
     var targetPath = $location.path();
     if (currentLocation != targetPath)
     {
       clearInterval(timer);
       auth.clear();
     }
+  });
+
+  $(document).ready(function() {
+    timerSetting();
   });
 });

@@ -105,7 +105,8 @@ public class ServiceTest {
   @Test
   public void getAvgMinMaxByInput() throws Exception {
     String bank = "신한은행";
-    MvcResult result = mockMvc.perform(get(GET_AVG_MIN_MAX_URI+"/"+bank)
+    MvcResult result = mockMvc.perform(get(GET_AVG_MIN_MAX_URI)
+        .param("bank", "외환은행")
         .header(HttpHeaders.AUTHORIZATION, BEARER_TYPE + " "+ accessToken))
         .andExpect(status().isOk())
         .andDo(print())

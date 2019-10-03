@@ -15,7 +15,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @NamedNativeQuery(name = "CreditGuaranteeHistory.getTotalAmountGroupbyYearBank",
-    query="SELECT T1.YEAR AS year, T2.INSTITUTE_NAME AS bank, SUM(T1.AMOUNT) AS totalAmount "
+    query="SELECT "
+            + "T1.YEAR AS year, "
+            + "T2.INSTITUTE_NAME AS bank, "
+            + "SUM(T1.AMOUNT) AS totalAmount "
         + "FROM TB_CREDIT_GUARANTEE_HISTORY AS T1 "
         + "INNER JOIN TB_BANK  AS T2 ON T1.INSTITUTE_CODE = T2.INSTITUTE_CODE "
         + "GROUP BY(T1.YEAR, T1.INSTITUTE_CODE)",

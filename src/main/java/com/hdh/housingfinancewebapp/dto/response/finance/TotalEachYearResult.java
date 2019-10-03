@@ -12,5 +12,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class TotalEachYearResult {
   private String name;
-  private List<TotalEachYearResultContent> summarys;
+  private List<TotalEachYearResultContent> summary;
 }

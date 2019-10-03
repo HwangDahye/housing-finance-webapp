@@ -31,7 +31,7 @@ public class LinearRegressionComponent {
       yybar += (y[i] - ybar) * (y[i] - ybar);   // 상관계수 구할때 사용, 측정값과 실제 값의 차이의 제곱의 합
       xybar += (x[i] - xbar) * (y[i] - ybar);
     }
-    slope  = xybar / xxbar;
+    slope  = xybar / xxbar;   // 최소 자승법에 의한 공식
     intercept = ybar - slope * xbar;
 
     // more statistical analysis

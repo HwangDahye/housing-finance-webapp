@@ -84,7 +84,7 @@ public class FinanceService {
   private static final int PREDICT_YEAR = 2018;
   private static final String BANK_CODE_PREFIX = "bnk";
 
-  private List<Bank> banks;
+  private List<Bank> banks; // TODO
 
   public ObjectResult<List<CreditGuaranteeHistory>> load(){
     clearData();
@@ -109,7 +109,6 @@ public class FinanceService {
 
     List<CreditGuaranteeHistory> historyList = new ArrayList<>();
 
-    // TODO : 더 좋은 방법이 있을까?
     for(List<String> columns : records){
       int year = Integer.parseInt(columns.get(csvYearIdx));
       int month = Integer.parseInt(columns.get(csvMonthIdx));
@@ -231,17 +230,17 @@ public class FinanceService {
 
     Bank bankObj = bankRepository.findByInstituteName(bank);
 
-    List<CreditGuaranteeHistory> datasOfSpecificBank = historyRepo.findAll().stream()
+    List<CreditGuaranteeHistory> dataOfSpecificBank = historyRepo.findAll().stream()
         .filter(item -> item.getPk().getBank().getInstituteName().equals(bank))
         .filter(item -> item.getPk().getMonth() == month)
         .collect(Collectors.toList());
 
-    if(datasOfSpecificBank.size() == 0){
+    if(dataOfSpecificBank.size() == 0){
       return responseComponent.getFailObjectResult(FAIL_DB_RESULT_EMPTY.getCode(), FAIL_DB_RESULT_EMPTY.getMsg());
     }
 
-    int[] amounts = datasOfSpecificBank.stream().mapToInt(item -> item.getAmount()).toArray();
-    int[] years = datasOfSpecificBank.stream().mapToInt(item -> item.getPk().getYear()).toArray();
+    int[] years = dataOfSpecificBank.stream().mapToInt(item -> item.getPk().getYear()).toArray();
+    int[] amounts = dataOfSpecificBank.stream().mapToInt(item -> item.getAmount()).toArray();
 
     linearRegressionComponent.process(years, amounts);
 

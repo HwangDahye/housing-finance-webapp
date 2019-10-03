@@ -1,5 +1,5 @@
 angular.module('login', ['auth']).controller('loginCtrl', function($scope, auth) {
-  var JOIN = "join";  var LOGIN = "login";
+  const JOIN = "join";  const LOGIN = "login";
   $scope.credentials = {id:null,password:null,name:null};
 
   $scope.authenticated = function() { return auth.authenticated; }
@@ -19,7 +19,7 @@ angular.module('login', ['auth']).controller('loginCtrl', function($scope, auth)
   };
   $scope.logout = function() { auth.clear(); }
 
-  setCredentials = function(type){
+  var setCredentials = function(type){
     if(type == JOIN){
       $scope.credentials.id = $('.form input[name="id"]').val();
       $scope.credentials.password = $('.form input[name="password"]').val();
