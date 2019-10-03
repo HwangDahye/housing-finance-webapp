@@ -24,9 +24,6 @@ public class FinanceController {
   @Autowired
   FinanceService financeService;
 
-  @Value("${default.bank.displayName}")
-  String defaultBank;
-
   @PostMapping(path = "/load")
   public ObjectResult<List<CreditGuaranteeHistory>> load(){
     return financeService.load();
@@ -49,7 +46,6 @@ public class FinanceController {
 
   @GetMapping(path = "/minmax/avg/amount")
   public ObjectResult<MinMaxAvgAmountResult> getMinMaxAvgAmount(@RequestParam(value="bank", required = false) Optional<String> bank){
-    // TODO : 한글 깨짐
     return financeService.getMinMaxAvgAmount(bank.isPresent() ? bank.get() : "외환은행");
   }
 

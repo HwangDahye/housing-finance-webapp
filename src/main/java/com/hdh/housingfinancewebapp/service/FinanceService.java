@@ -84,8 +84,6 @@ public class FinanceService {
   private static final int PREDICT_YEAR = 2018;
   private static final String BANK_CODE_PREFIX = "bnk";
 
-  private List<Bank> banks; // TODO
-
   public ObjectResult<List<CreditGuaranteeHistory>> load(){
     clearData();
 
@@ -101,7 +99,7 @@ public class FinanceService {
 
     // create bank list
     List<String> bankNames = records.get(csvHeaderRow).subList(csvBankStartIdx, records.get(0).size());
-    banks = createBanks(bankNames);
+    List<Bank> banks = createBanks(bankNames);
     bankRepository.saveAll(banks);
 
     // create history list
