@@ -18,7 +18,8 @@
 ### Preview  
 ![login.PNG](./img/login.PNG)  ![home.PNG](./img/home.PNG)  
 ### Framework  
-Spring Boot(jpa, security, web, freemarker)  
+Back-End : Spring Boot v2.1.8(jpa, security, web, freemarker)  
+Front-End : AngularJS v1.3.9  
 ### Library 
 |Project name|Version|Purpose|Link|
 |:-----------|:------|:------|:---|
@@ -31,6 +32,11 @@ Spring Boot(jpa, security, web, freemarker)
 HOUSING-FINANCE-WEBAPP
 |   pom.xml
 |   README.md
++---img
+|       home.PNG
+|       login.PNG
++---out
+|       housing-finance-webapp-0.0.1.jar
 +---src
     +---main
     |   +---java
@@ -46,9 +52,9 @@ HOUSING-FINANCE-WEBAPP
     |   |               |
     |   |               +---config
     |   |               |       SecurityConfiguration.java
-    |   |               |       WebConfig.java
     |   |               |
     |   |               +---controller
+    |   |               |       BaseViewController.java
     |   |               |       FinanceController.java
     |   |               |       LoginRestController.java
     |   |               |
@@ -56,7 +62,6 @@ HOUSING-FINANCE-WEBAPP
     |   |               |   |   TotalAmountGroupbyYearBankDto.java
     |   |               |   |
     |   |               |   +---request
-    |   |               |   |       LoginReq.java
     |   |               |   |       SignUpReq.java
     |   |               |   |
     |   |               |   \---response
@@ -117,8 +122,30 @@ HOUSING-FINANCE-WEBAPP
     |       |   data.sql
     |       |   schema.sql
     |       |
+    |       +---assets
+    |       |     financeData.csv
+    |       |
     |       +---static
+    |       |   \---resources
+    |       |       |   app.js
+    |       |       |
+    |       |       +---home
+    |       |       |       home.css
+    |       |       |       home.html
+    |       |       |       home.js
+    |       |       |
+    |       |       +---login
+    |       |       |       login.css
+    |       |       |       login.html
+    |       |       |       login.js
+    |       |       |
+    |       |       \---scripts
+    |       |           +---auth
+    |       |           |       auth.js
+    |       |           |
+    |       |           \---libs
     |       \---templates
+    |               index.ftl
     \---test
         \---java
             \---com
