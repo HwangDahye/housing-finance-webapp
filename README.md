@@ -1,5 +1,6 @@
 # housing-finance-webapp
 
+## Guide  
 ### How to run
 
 1. download runnable jar file : [jar download](https://github.com/HwangDahye/housing-finance-webapp/raw/master/out/housing-finance-webapp-0.0.1.jar)
@@ -17,9 +18,15 @@
 
 ### Preview  
 ![login.PNG](./img/login.PNG)  ![home.PNG](./img/home.PNG)  
+
+## Problem-solving Strategy  
+- 지원금액 예측 : Linear Regression(Least squared method 활용)  
+
+## Environment 
 ### Framework  
 Back-End : Spring Boot v2.1.8(jpa, security, web, freemarker)  
 Front-End : AngularJS v1.3.9  
+
 ### Library 
 |Project name|Version|Purpose|Link|
 |:-----------|:------|:------|:---|
